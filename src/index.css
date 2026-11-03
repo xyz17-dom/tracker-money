@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --color-scheme: light;
   --latar: #F6F5FB;
   --card: #FFFFFF;
   --teks: #22223B;
@@ -20,6 +21,7 @@
 }
 
 [data-theme="dark"] {
+  color-scheme: dark;
   --latar: #14141F;
   --card: #1E1E2D;
   --teks: #ECECF6;
