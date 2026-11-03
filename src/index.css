@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --latar: #F6F5FB;
+  --card: #FFFFFF;
+  --teks: #22223B;
+  --teks-sekunder: #6B6B85;
+  --aksen: #5B5BD6;
+  --aksen-teks: #5B5BD6;
+  --aksen-tint: #ECECFC;
+  --track: #E6E6F2;
+  --segmen-aktif: #FFFFFF;
+  --batang: #D9D9F2;
+  --pemasukan: #1B7F5C;
+  --grafik-2: #F6B8A0;
+  --grafik-3: #8FD3C1;
+  --peringatan-tint: #FDECE8;
+  --peringatan-teks: #B3402F;
+  --peringatan-bar: #E57A66;
+}
+
+[data-theme="dark"] {
+  --latar: #14141F;
+  --card: #1E1E2D;
+  --teks: #ECECF6;
+  --teks-sekunder: #A3A3BC;
+  --aksen: #6C6CE5;
+  --aksen-teks: #B4B4FF;
+  --aksen-tint: #2A2A45;
+  --track: #2B2B40;
+  --segmen-aktif: #3A3A58;
+  --batang: #3A3A58;
+  --pemasukan: #6FD3A8;
+  --grafik-2: #E8A087;
+  --grafik-3: #6FBFA8;
+  --peringatan-tint: #3A2428;
+  --peringatan-teks: #FFB4A8;
+  --peringatan-bar: #F0897A;
+}
+
+@theme inline {
+  --color-latar: var(--latar);
+  --color-card: var(--card);
+  --color-teks: var(--teks);
+  --color-teks-sekunder: var(--teks-sekunder);
+  --color-aksen: var(--aksen);
+  --color-aksen-teks: var(--aksen-teks);
+  --color-aksen-tint: var(--aksen-tint);
+  --color-track: var(--track);
+  --color-peringatan-tint: var(--peringatan-tint);
+  --color-peringatan-teks: var(--peringatan-teks);
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --color-segmen-aktif: var(--segmen-aktif);
+  --color-pemasukan: var(--pemasukan);
+  --color-peringatan-bar: var(--peringatan-bar);
+  --color-batang: var(--batang);
+}
+
+body {
+  margin: 0;
+  background: var(--latar);
+  color: var(--teks);
+  font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
