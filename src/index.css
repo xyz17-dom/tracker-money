@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-scheme: light;
+  color-scheme: light;
   --latar: #F6F5FB;
   --card: #FFFFFF;
   --teks: #22223B;
@@ -18,6 +18,7 @@
   --peringatan-tint: #FDECE8;
   --peringatan-teks: #B3402F;
   --peringatan-bar: #E57A66;
+  --bahaya: #C0392B;
 }
 
 [data-theme="dark"] {
@@ -38,6 +39,7 @@
   --peringatan-tint: #3A2428;
   --peringatan-teks: #FFB4A8;
   --peringatan-bar: #F0897A;
+  --bahaya: #CF3F3F;
 }
 
 @theme inline {
@@ -49,13 +51,14 @@
   --color-aksen-teks: var(--aksen-teks);
   --color-aksen-tint: var(--aksen-tint);
   --color-track: var(--track);
+  --color-segmen-aktif: var(--segmen-aktif);
+  --color-batang: var(--batang);
+  --color-pemasukan: var(--pemasukan);
   --color-peringatan-tint: var(--peringatan-tint);
   --color-peringatan-teks: var(--peringatan-teks);
-  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
-  --color-segmen-aktif: var(--segmen-aktif);
-  --color-pemasukan: var(--pemasukan);
   --color-peringatan-bar: var(--peringatan-bar);
-  --color-batang: var(--batang);
+  --color-bahaya: var(--bahaya);
+  --font-sans: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 body {

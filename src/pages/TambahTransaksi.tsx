@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Transaction } from '../db/db'
-import { bacaFavorit } from '../db/pengaturanRepo'
 import {
   hapusTransaksi,
   tambahTransaksi,
   ubahTransaksi,
 } from '../db/transaksiRepo'
+import { bacaFavorit } from '../db/pengaturanRepo'
 import { formatRibuan, hanyaAngka } from '../utils/format'
 
 type Props = {
@@ -38,6 +38,13 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
   const aktifSourceId = sourceId ?? sources?.[0]?.id ?? null
   const bisaSimpan = nominal > 0 && categoryId !== null && aktifSourceId !== null
 
+  // Kategori favorit tampil paling atas; sisanya tetap berurutan seperti semula
+  const kategoriUrut = [...(categories ?? [])].sort(
+    (a, b) =>
+      Number(favorit?.includes(b.id) ?? false) -
+      Number(favorit?.includes(a.id) ?? false),
+  )
+
   async function simpan() {
     if (nominal <= 0 || categoryId === null || aktifSourceId === null) return
     const input = {
@@ -54,13 +61,6 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
     }
     onClose()
   }
-
-  // Kategori favorit tampil paling atas; sisanya tetap berurutan seperti semula
-  const kategoriUrut = [...(categories ?? [])].sort(
-    (a, b) =>
-      Number(favorit?.includes(b.id) ?? false) -
-      Number(favorit?.includes(a.id) ?? false),
-  )
 
   async function hapus() {
     if (!transaksi) return
@@ -92,9 +92,7 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
             aria-pressed={type === t}
             onClick={() => setType(t)}
             className={`min-h-10 flex-1 rounded-[9px] text-sm ${
-              type === t
-                ? 'bg-segmen-aktif font-bold'
-                : 'text-teks-sekunder'
+              type === t ? 'bg-segmen-aktif font-bold' : 'text-teks-sekunder'
             }`}
           >
             {t === 'expense' ? 'Pengeluaran' : 'Pemasukan'}
@@ -168,49 +166,51 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
         className="h-12 rounded-xl bg-card px-4 text-sm outline-none focus:ring-2 focus:ring-aksen"
       />
 
-      <div className="mt-auto flex flex-col gap-2">
-        {mengubah && !konfirmasiHapus && (
-          <button
-            type="button"
-            onClick={() => setKonfirmasiHapus(true)}
-            className="min-h-11 text-sm font-semibold text-peringatan-teks"
+      <div className="mt-auto flex flex-col items-center gap-3 pt-2">
+        {mengubah && konfirmasiHapus ? (
+          <div
+            role="alert"
+            className="flex w-full flex-col items-center gap-3 rounded-[20px] bg-peringatan-tint p-4"
           >
-            Hapus transaksi
-          </button>
-        )}
-
-        {mengubah && konfirmasiHapus && (
-          <div role="alert" className="rounded-[20px] bg-peringatan-tint p-4">
-            <p className="text-sm font-semibold text-peringatan-teks">
+            <p className="text-center text-sm font-semibold text-peringatan-teks">
               Hapus transaksi ini? Tindakan ini tidak bisa dibatalkan.
             </p>
-            <div className="mt-3 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setKonfirmasiHapus(false)}
-                className="min-h-11 flex-1 rounded-xl bg-card text-sm font-semibold"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={hapus}
-                className="min-h-11 flex-1 rounded-xl bg-peringatan-teks text-sm font-bold text-peringatan-tint"
-              >
-                Ya, hapus
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setKonfirmasiHapus(false)}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-card text-sm font-semibold"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onClick={hapus}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white"
+            >
+              Ya, hapus
+            </button>
           </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={!bisaSimpan}
+              onClick={simpan}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-aksen text-sm font-bold text-white disabled:opacity-40"
+            >
+              {mengubah ? 'Simpan perubahan' : 'Simpan'}
+            </button>
+            {mengubah && (
+              <button
+                type="button"
+                onClick={() => setKonfirmasiHapus(true)}
+                className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white"
+              >
+                Hapus transaksi
+              </button>
+            )}
+          </>
         )}
-
-        <button
-          type="button"
-          disabled={!bisaSimpan}
-          onClick={simpan}
-          className="min-h-[52px] rounded-2xl bg-aksen text-base font-bold text-white disabled:opacity-40"
-        >
-          {mengubah ? 'Simpan perubahan' : 'Simpan'}
-        </button>
       </div>
     </div>
   )
