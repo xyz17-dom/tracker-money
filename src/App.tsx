@@ -58,7 +58,7 @@ export default function App() {
         )}
 
       {bisaTambah && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-20 z-10 mx-auto flex max-w-[430px] justify-end pr-5">
+        <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 mx-auto flex max-w-[430px] justify-end pr-5">
           <button
             type="button"
             aria-label="Tambah transaksi"
