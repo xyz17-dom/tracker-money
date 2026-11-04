@@ -1,11 +1,13 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Download, Upload } from 'lucide-react'
+import { Download, FileSpreadsheet, Upload } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { ekspor, impor, unduh } from '../db/cadangan'
+import { buatLaporanExcel } from '../db/eksporExcel'
 import { KUNCI_PENGINGAT, simpanPengaturan } from '../db/pengaturanRepo'
 import { todayString } from '../utils/format'
 import { bacaTema, simpanTema, type Tema } from '../utils/tema'
+import { unduhBlob } from '../utils/unduh'
 
 const TEMA: { id: Tema; label: string }[] = [
   { id: 'system', label: 'Ikuti sistem' },
@@ -21,6 +23,7 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
   const [tema, setTema] = useState<Tema>(bacaTema)
   const [status, setStatus] = useState<Status>(null)
   const [berkas, setBerkas] = useState<File | null>(null)
+  const [menyiapkanExcel, setMenyiapkanExcel] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const budget = useLiveQuery(() => db.budgets.toCollection().first())
@@ -49,6 +52,19 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
       })
     } catch {
       setStatus({ jenis: 'galat', teks: 'Gagal membuat cadangan.' })
+    }
+  }
+
+  async function unduhExcel() {
+    setMenyiapkanExcel(true)
+    setStatus(null)
+    try {
+      unduhBlob(`tracker-money-laporan-${todayString()}.xlsx`, await buatLaporanExcel())
+      setStatus({ jenis: 'ok', teks: 'Laporan Excel diunduh.' })
+    } catch {
+      setStatus({ jenis: 'galat', teks: 'Gagal membuat laporan Excel. Coba lagi.' })
+    } finally {
+      setMenyiapkanExcel(false)
     }
   }
 
@@ -150,6 +166,22 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
             <span className="block text-sm">Ekspor cadangan (.json)</span>
             <span className="block text-xs text-teks-sekunder">
               Simpan semua datamu ke sebuah file.
+            </span>
+          </span>
+        </button>
+        <button
+          type="button"
+          disabled={menyiapkanExcel}
+          onClick={unduhExcel}
+          className="flex min-h-16 w-full items-center gap-3 border-b border-track text-left disabled:opacity-60"
+        >
+          <FileSpreadsheet size={20} className="flex-none text-aksen-teks" />
+          <span className="flex-1">
+            <span className="block text-sm">Ekspor laporan Excel (.xlsx)</span>
+            <span className="block text-xs text-teks-sekunder">
+              {menyiapkanExcel
+                ? 'Menyiapkan laporan...'
+                : 'Untuk dibaca atau diolah di Excel. Bukan untuk diimpor kembali.'}
             </span>
           </span>
         </button>
