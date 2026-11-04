@@ -1,21 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import BottomNav, { type Tab } from './components/BottomNav'
-import type { Transaction } from './db/db'
-import Riwayat from './pages/Riwayat'
-import TambahTransaksi from './pages/TambahTransaksi'
+import { db, type Transaction } from './db/db'
+import { KUNCI_ONBOARDING } from './db/pengaturanRepo'
+import { pulihkanTransaksi } from './db/transaksiRepo'
 import Anggaran from './pages/Anggaran'
 import Beranda from './pages/Beranda'
-import Pengaturan from './pages/Pengaturan'
-import { useLiveQuery } from 'dexie-react-hooks'
-import { db } from './db/db'
-import { KUNCI_ONBOARDING } from './db/pengaturanRepo'
 import Onboarding from './pages/Onboarding'
+import Pengaturan from './pages/Pengaturan'
+import Riwayat from './pages/Riwayat'
+import TambahTransaksi from './pages/TambahTransaksi'
 
 export default function App() {
-  // Sementara dimulai dari Riwayat karena Beranda belum dibuat
   const [tab, setTab] = useState<Tab>('beranda')
   const [tambahTerbuka, setTambahTerbuka] = useState(false)
   const [diedit, setDiedit] = useState<Transaction | null>(null)
+  // Transaksi yang baru dihapus, disimpan sebentar agar bisa diurungkan
+  const [terhapus, setTerhapus] = useState<Transaction | null>(null)
+
+  // Pesan "Transaksi dihapus" hilang sendiri setelah 6 detik
+  useEffect(() => {
+    if (!terhapus) return
+    const timer = setTimeout(() => setTerhapus(null), 6000)
+    return () => clearTimeout(timer)
+  }, [terhapus])
 
   // Onboarding dianggap selesai jika sudah ditandai, atau jika sudah ada data
   // (pengguna lama tidak perlu diminta mengisi ulang)
@@ -28,7 +36,7 @@ export default function App() {
     ])
     return anggaran > 0 || transaksi > 0
   })
-  
+
   if (onboardingSelesai === undefined) return null
   if (!onboardingSelesai) return <Onboarding />
 
@@ -41,9 +49,18 @@ export default function App() {
       <TambahTransaksi
         key={diedit.id}
         transaksi={diedit}
-        onClose={() => setDiedit(null)}
+        onClose={(dihapus) => {
+          setDiedit(null)
+          if (dihapus) setTerhapus(dihapus)
+        }}
       />
     )
+  }
+
+  async function urungkan() {
+    if (!terhapus) return
+    await pulihkanTransaksi(terhapus)
+    setTerhapus(null)
   }
 
   const bisaTambah = tab === 'beranda' || tab === 'riwayat'
@@ -55,7 +72,25 @@ export default function App() {
       {tab === 'anggaran' && <Anggaran />}
       {tab === 'pengaturan' && (
         <Pengaturan onBukaAnggaran={() => setTab('anggaran')} />
-        )}
+      )}
+
+      {terhapus && (
+        <div
+          role="status"
+          className="fixed inset-x-0 bottom-[calc(9rem+env(safe-area-inset-bottom))] z-20 mx-auto flex max-w-[430px] justify-center px-4"
+        >
+          <div className="flex items-center gap-3 rounded-2xl bg-teks py-2 pl-4 pr-2 text-sm text-latar shadow-lg">
+            <span>Transaksi dihapus</span>
+            <button
+              type="button"
+              onClick={urungkan}
+              className="min-h-11 rounded-xl px-3 font-bold underline"
+            >
+              Urungkan
+            </button>
+          </div>
+        </div>
+      )}
 
       {bisaTambah && (
         <div className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-10 mx-auto flex max-w-[430px] justify-end pr-5">

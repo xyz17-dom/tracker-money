@@ -82,10 +82,14 @@ export async function impor(teks: string): Promise<number> {
   try {
     data = JSON.parse(teks)
   } catch {
-    throw new Error('File bukan JSON yang valid.')
+    throw new Error(
+      'File ini bukan file cadangan Tracker Money (.json). Impor dari Excel atau foto belum tersedia',
+    )
   }
   if (!adalahObjek(data) || data.aplikasi !== 'tracker-money') {
-    throw new Error('File ini bukan cadangan Tracker Money.')
+      throw new Error(
+      'File ini bukan cadangan Tracker Money. Impor dari Excel atau foto belum tersedia.',
+    )
   }
   if (data.versi !== VERSI) {
     throw new Error('Versi cadangan ini tidak didukung.')

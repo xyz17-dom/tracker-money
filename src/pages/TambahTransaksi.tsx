@@ -10,7 +10,8 @@ import { bacaFavorit } from '../db/pengaturanRepo'
 import { formatRibuan, hanyaAngka } from '../utils/format'
 
 type Props = {
-  onClose: () => void
+  // Jika transaksi baru saja dihapus, ia dilaporkan agar bisa diurungkan
+  onClose: (dihapus?: Transaction) => void
   transaksi?: Transaction // jika ada, layar ini mengubah transaksi tersebut
 }
 
@@ -65,7 +66,7 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
   async function hapus() {
     if (!transaksi) return
     await hapusTransaksi(transaksi.id)
-    onClose()
+    onClose(transaksi)
   }
 
   return (
@@ -77,7 +78,7 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
         <button
           type="button"
           aria-label="Tutup"
-          onClick={onClose}
+          onClick={() => onClose()}
           className="h-11 w-11 text-2xl"
         >
           ×
@@ -173,7 +174,8 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
             className="flex w-full flex-col items-center gap-3 rounded-[20px] bg-peringatan-tint p-4"
           >
             <p className="text-center text-sm font-semibold text-peringatan-teks">
-              Hapus transaksi ini? Tindakan ini tidak bisa dibatalkan.
+              Hapus transaksi ini? Kamu masih bisa mengurungkannya beberapa
+              detik setelahnya.
             </p>
             <button
               type="button"

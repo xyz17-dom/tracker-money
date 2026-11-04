@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { Download, Upload } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { ekspor, impor, unduh } from '../db/cadangan'
@@ -94,6 +95,10 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
             </button>
           ))}
         </div>
+        <p className="mt-3 text-xs text-teks-sekunder">
+          Memakai HP Samsung dan warnanya tidak sesuai pilihan? Pasang aplikasi
+          lewat Chrome, atau matikan mode gelap paksa di Samsung Internet.
+        </p>
       </div>
 
       <h2 className="mt-1 text-xs text-teks-sekunder">Anggaran</h2>
@@ -138,18 +143,29 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
         <button
           type="button"
           onClick={unduhCadangan}
-          className="flex min-h-14 w-full items-center justify-between border-b border-track text-sm"
+          className="flex min-h-16 w-full items-center gap-3 border-b border-track text-left"
         >
-          <span>Ekspor data (JSON)</span>
-          <span className="text-[13px] text-teks-sekunder">›</span>
+          <Download size={20} className="flex-none text-aksen-teks" />
+          <span className="flex-1">
+            <span className="block text-sm">Ekspor cadangan (.json)</span>
+            <span className="block text-xs text-teks-sekunder">
+              Simpan semua datamu ke sebuah file.
+            </span>
+          </span>
         </button>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex min-h-14 w-full items-center justify-between text-sm"
+          className="flex min-h-16 w-full items-center gap-3 text-left"
         >
-          <span>Impor data</span>
-          <span className="text-[13px] text-teks-sekunder">›</span>
+          <Upload size={20} className="flex-none text-aksen-teks" />
+          <span className="flex-1">
+            <span className="block text-sm">Impor cadangan (.json)</span>
+            <span className="block text-xs text-teks-sekunder">
+              Hanya untuk file cadangan dari Tracker Money. Menggantikan semua
+              data saat ini.
+            </span>
+          </span>
         </button>
         <input
           ref={inputRef}
@@ -160,6 +176,11 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
           aria-label="Pilih file cadangan"
         />
       </div>
+
+      <p className="rounded-xl bg-aksen-tint p-3 text-xs text-aksen-teks">
+        Semua datamu tersimpan di HP ini dan tidak dikirim ke mana pun. Pindah
+        HP? Ekspor cadangan dulu, lalu impor di HP baru.
+      </p>
 
       {berkas && (
         <div role="alert" className="rounded-[20px] bg-peringatan-tint p-4">
@@ -178,7 +199,7 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
             <button
               type="button"
               onClick={jalankanImpor}
-              className="min-h-11 flex-1 rounded-xl bg-peringatan-teks text-sm font-bold text-peringatan-tint"
+              className="min-h-11 flex-1 rounded-xl bg-bahaya text-sm font-bold text-white"
             >
               Ya, ganti data
             </button>

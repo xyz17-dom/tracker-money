@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChevronRight } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db, type Transaction } from '../db/db'
 import { formatRupiah, labelHari } from '../utils/format'
@@ -36,7 +37,14 @@ export default function Riwayat({ onPilih }: Props) {
 
   return (
     <div className="flex flex-col gap-3 p-4">
-      <h1 className="text-[22px] font-bold">Riwayat</h1>
+      <div>
+        <h1 className="text-[22px] font-bold">Riwayat</h1>
+        {tampil.length > 0 && (
+          <p className="mt-0.5 text-xs text-teks-sekunder">
+            Ketuk transaksi untuk mengubah atau menghapus.
+          </p>
+        )}
+      </div>
 
       <div className="flex gap-2">
         {FILTER.map((f) => (
@@ -95,6 +103,10 @@ export default function Riwayat({ onPilih }: Props) {
                   {t.type === 'income' ? '+' : '−'}
                   {formatRupiah(t.amount)}
                 </span>
+                <ChevronRight
+                  size={18}
+                  className="flex-none text-teks-sekunder"
+                />
               </button>
             ))}
           </div>

@@ -38,3 +38,8 @@ export async function ubahTransaksi(id: number, input: InputTransaksi) {
 export async function hapusTransaksi(id: number) {
   await db.transactions.delete(id)
 }
+
+// Mengembalikan transaksi yang baru dihapus, lengkap dengan id dan tanggalnya
+export async function pulihkanTransaksi(transaksi: Transaction) {
+  await db.transactions.put(transaksi)
+}
