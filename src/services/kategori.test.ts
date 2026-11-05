@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { Transaction } from '../db/db'
-import { pastikanKategoriPemasukan, type KategoriLama } from './kategori'
+import type { Category } from '../db/db'
+import {
+  PANJANG_NAMA_MAKS,
+  pastikanKategoriPemasukan,
+  validasiNamaKategori,
+  type KategoriLama,
+} from './kategori'
 
 const tx = (id: number, type: 'income' | 'expense', categoryId: number): Transaction => ({
   id, type, amount: 1000, categoryId, sourceId: 1, note: '', date: '2026-11-01', createdAt: id, updatedAt: id,
@@ -35,5 +41,42 @@ describe('pastikanKategoriPemasukan', () => {
     const h = pastikanKategoriPemasukan(sudah, data)
     expect(h.categories).toHaveLength(3)
     expect(h.transactions).toBe(data)
+  })
+})
+
+describe('validasiNamaKategori', () => {
+  const daftar: Category[] = [
+    { id: 1, name: 'Makan', color: '', kind: 'expense', isDefault: true },
+    { id: 2, name: 'Lainnya', color: '', kind: 'expense', isDefault: true },
+    { id: 3, name: 'Lainnya', color: '', kind: 'income', isDefault: true },
+  ]
+
+  it('merapikan spasi dan menerima nama yang sah', () => {
+    expect(validasiNamaKategori('  Kos   bulanan ', 'expense', daftar)).toEqual({
+      ok: true,
+      nama: 'Kos bulanan',
+    })
+  })
+
+  it('menolak nama kosong', () => {
+    expect(validasiNamaKategori('   ', 'expense', daftar)).toMatchObject({ ok: false })
+  })
+
+  it('menolak nama yang terlalu panjang', () => {
+    const panjang = 'a'.repeat(PANJANG_NAMA_MAKS + 1)
+    expect(validasiNamaKategori(panjang, 'expense', daftar)).toMatchObject({ ok: false })
+    expect(validasiNamaKategori('a'.repeat(PANJANG_NAMA_MAKS), 'expense', daftar)).toMatchObject({ ok: true })
+  })
+
+  it('menolak nama kembar di jenis yang sama tanpa membedakan huruf besar', () => {
+    expect(validasiNamaKategori('makan', 'expense', daftar)).toMatchObject({ ok: false })
+  })
+
+  it('mengizinkan nama yang sama di jenis berbeda', () => {
+    expect(validasiNamaKategori('Makan', 'income', daftar)).toMatchObject({ ok: true })
+  })
+
+  it('tidak menganggap kategori kembar dengan dirinya sendiri saat diubah', () => {
+    expect(validasiNamaKategori('MAKAN', 'expense', daftar, 1)).toMatchObject({ ok: true })
   })
 })

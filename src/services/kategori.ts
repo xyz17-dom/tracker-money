@@ -55,3 +55,52 @@ export function pastikanKategoriPemasukan(
     ),
   }
 }
+
+// ---------- Kategori buatan pengguna ----------
+
+export const PANJANG_NAMA_MAKS = 20
+
+// Warna dipakai bergiliran untuk kategori baru
+export const PALET_KATEGORI = [
+  '#5B5BD6',
+  '#F6B8A0',
+  '#8FD3C1',
+  '#D9D9F2',
+  '#6C6CE5',
+  '#A3A3BC',
+  '#E57A66',
+  '#1B7F5C',
+]
+
+export type HasilNama = { ok: true; nama: string } | { ok: false; pesan: string }
+
+// Nama harus terisi, tidak terlalu panjang, dan tidak kembar di jenis yang sama.
+// `kecualiId` dipakai saat mengubah nama agar kategori itu tidak dianggap kembar
+// dengan dirinya sendiri.
+export function validasiNamaKategori(
+  nama: string,
+  kind: Category['kind'],
+  daftar: Category[],
+  kecualiId?: number,
+): HasilNama {
+  const bersih = nama.trim().replace(/\s+/g, ' ')
+  if (bersih === '') {
+    return { ok: false, pesan: 'Nama kategori tidak boleh kosong.' }
+  }
+  if (bersih.length > PANJANG_NAMA_MAKS) {
+    return {
+      ok: false,
+      pesan: `Nama kategori maksimal ${PANJANG_NAMA_MAKS} huruf.`,
+    }
+  }
+  const kembar = daftar.some(
+    (c) =>
+      c.kind === kind &&
+      c.id !== kecualiId &&
+      c.name.toLowerCase() === bersih.toLowerCase(),
+  )
+  if (kembar) {
+    return { ok: false, pesan: 'Nama kategori itu sudah dipakai.' }
+  }
+  return { ok: true, nama: bersih }
+}
