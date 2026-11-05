@@ -37,7 +37,6 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
 
   // Jika sumber dana belum dipilih, pakai yang pertama (Tunai)
   const aktifSourceId = sourceId ?? sources?.[0]?.id ?? null
-  const bisaSimpan = nominal > 0 && categoryId !== null && aktifSourceId !== null
 
   // Kategori favorit tampil paling atas; sisanya tetap berurutan seperti semula
   const kategoriUrut = [...(categories ?? [])].sort(
@@ -46,12 +45,28 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
       Number(favorit?.includes(a.id) ?? false),
   )
 
+  // Hanya kategori yang sesuai jenis transaksi yang ditampilkan
+  const kategoriTampil = kategoriUrut.filter((c) => c.kind === type)
+
+  // Kategori terpilih harus sesuai jenis. Jika belum ada yang sesuai,
+  // pemasukan otomatis memakai kategori pertamanya (mis. "Uang saku"),
+  // sedangkan pengeluaran tetap meminta pengguna memilih.
+  const aktifCategoryId =
+    categoryId !== null && kategoriTampil.some((c) => c.id === categoryId)
+      ? categoryId
+      : type === 'income'
+        ? (kategoriTampil[0]?.id ?? null)
+        : null
+
+  const bisaSimpan =
+    nominal > 0 && aktifCategoryId !== null && aktifSourceId !== null
+
   async function simpan() {
-    if (nominal <= 0 || categoryId === null || aktifSourceId === null) return
+    if (nominal <= 0 || aktifCategoryId === null || aktifSourceId === null) return
     const input = {
       type,
       amount: nominal,
-      categoryId,
+      categoryId: aktifCategoryId,
       sourceId: aktifSourceId,
       note,
     }
@@ -121,14 +136,14 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
 
       <p className="mt-1 text-xs text-teks-sekunder">Kategori</p>
       <div className="grid grid-cols-3 gap-2">
-        {kategoriUrut.map((c) => (
+        {kategoriTampil.map((c) => (
           <button
             key={c.id}
             type="button"
-            aria-pressed={categoryId === c.id}
+            aria-pressed={aktifCategoryId === c.id}
             onClick={() => setCategoryId(c.id)}
             className={`min-h-16 rounded-[20px] border-2 p-2 text-sm ${
-              categoryId === c.id
+              aktifCategoryId === c.id
                 ? 'border-aksen bg-aksen-tint font-bold'
                 : 'border-transparent bg-card'
             }`}

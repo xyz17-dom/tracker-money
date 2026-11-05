@@ -26,7 +26,9 @@ export default function Anggaran() {
         : [],
     [budget?.id],
   )
-  const categories = useLiveQuery(() => db.categories.toArray())
+  const categories = useLiveQuery(() =>
+  db.categories.filter((c) => c.kind === 'expense').toArray(),
+)
   const transaksi = useLiveQuery(() => db.transactions.toArray())
 
   if (!budgets || !limits || !categories || !transaksi) {

@@ -16,7 +16,9 @@ const SARAN: Record<PeriodType, number[]> = {
 }
 
 export default function Onboarding() {
-  const categories = useLiveQuery(() => db.categories.toArray())
+  const categories = useLiveQuery(() =>
+  db.categories.filter((c) => c.kind === 'expense').toArray(),
+)
 
   const [langkah, setLangkah] = useState(1)
   const [periode, setPeriode] = useState<PeriodType>('weekly')
