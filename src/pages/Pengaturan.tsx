@@ -3,6 +3,7 @@ import { Download, FileSpreadsheet, Upload } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { ekspor, impor, unduh } from '../db/cadangan'
+import { hapusSemuaData } from '../db/dataRepo'
 import { buatLaporanExcel } from '../db/eksporExcel'
 import { KUNCI_PENGINGAT, simpanPengaturan } from '../db/pengaturanRepo'
 import { todayString } from '../utils/format'
@@ -24,6 +25,9 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
   const [status, setStatus] = useState<Status>(null)
   const [berkas, setBerkas] = useState<File | null>(null)
   const [menyiapkanExcel, setMenyiapkanExcel] = useState(false)
+  const [konfirmasiSemua, setKonfirmasiSemua] = useState(false)
+  const [ketikan, setKetikan] = useState('')
+  const [menghapus, setMenghapus] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const budget = useLiveQuery(() => db.budgets.toCollection().first())
@@ -33,6 +37,7 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
 
   const labelPeriode = budget?.periodType === 'monthly' ? 'Bulanan' : 'Mingguan'
   const pengingatAktif = pengingat !== 'off'
+  const kataCocok = ketikan.trim().toUpperCase() === 'HAPUS'
 
   function pilihTema(t: Tema) {
     setTema(t)
@@ -65,6 +70,21 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
       setStatus({ jenis: 'galat', teks: 'Gagal membuat laporan Excel. Coba lagi.' })
     } finally {
       setMenyiapkanExcel(false)
+    }
+  }
+
+  async function hapusSemua() {
+    if (!kataCocok) return
+    setMenghapus(true)
+    try {
+      // Setelah data kosong, App.tsx otomatis menampilkan onboarding
+      await hapusSemuaData()
+      setKonfirmasiSemua(false)
+      setKetikan('')
+    } catch {
+      setStatus({ jenis: 'galat', teks: 'Gagal menghapus data. Coba lagi.' })
+    } finally {
+      setMenghapus(false)
     }
   }
 
@@ -251,6 +271,74 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
           {status.teks}
         </p>
       )}
+
+      <h2 className="mt-1 text-xs text-peringatan-teks">Zona berbahaya</h2>
+      <div className="rounded-[20px] bg-card p-4 shadow-sm">
+        {!konfirmasiSemua ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-full">
+              <p className="text-sm font-semibold">Hapus semua data</p>
+              <p className="mt-1 text-xs text-teks-sekunder">
+                Menghapus semua transaksi, anggaran, dan pengaturan di HP ini,
+                lalu memulai dari awal. Pilihan tema tidak ikut terhapus.
+                Tindakan ini tidak bisa dibatalkan.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setKonfirmasiSemua(true)}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white"
+            >
+              Hapus semua data
+            </button>
+          </div>
+        ) : (
+          <div role="alert" className="flex flex-col items-center gap-3">
+            <p className="w-full text-sm font-semibold text-peringatan-teks">
+              Semua datamu akan hilang. Simpan cadangan dulu supaya bisa
+              dipulihkan lewat Impor.
+            </p>
+            <button
+              type="button"
+              onClick={unduhCadangan}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-aksen text-sm font-bold text-white"
+            >
+              Unduh cadangan dulu
+            </button>
+            <label htmlFor="ketik-hapus" className="w-full text-xs text-teks-sekunder">
+              Ketik HAPUS untuk melanjutkan
+            </label>
+            <input
+              id="ketik-hapus"
+              type="text"
+              autoComplete="off"
+              autoCapitalize="characters"
+              placeholder="HAPUS"
+              value={ketikan}
+              onChange={(e) => setKetikan(e.target.value)}
+              className="h-12 w-full rounded-xl bg-latar px-4 text-sm outline-none focus:ring-2 focus:ring-bahaya"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                setKonfirmasiSemua(false)
+                setKetikan('')
+              }}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-latar text-sm font-semibold"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              disabled={!kataCocok || menghapus}
+              onClick={hapusSemua}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white disabled:opacity-40"
+            >
+              {menghapus ? 'Menghapus...' : 'Ya, hapus semua'}
+            </button>
+          </div>
+        )}
+      </div>
 
       <p className="mt-2 text-center text-xs text-teks-sekunder">
         Tracker Money · versi 0.1

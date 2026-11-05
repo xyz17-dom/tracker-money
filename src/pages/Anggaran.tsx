@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import InputNominal from '../components/inputNominal'
 import { db, type BudgetCategory } from '../db/db'
 import { simpanAnggaran, simpanBatasKategori } from '../db/anggaranRepo'
+import { hapusAnggaran } from '../db/dataRepo'
 import {
   AMBANG_PERINGATAN,
   hitungRingkasan,
@@ -16,6 +18,8 @@ const PERIODE: { id: PeriodType; label: string; kata: string }[] = [
 ]
 
 export default function Anggaran() {
+  const [konfirmasiHapus, setKonfirmasiHapus] = useState(false)
+
   const budgets = useLiveQuery(() => db.budgets.toArray())
   const budget = budgets?.[0]
 
@@ -27,8 +31,8 @@ export default function Anggaran() {
     [budget?.id],
   )
   const categories = useLiveQuery(() =>
-  db.categories.filter((c) => c.kind === 'expense').toArray(),
-)
+    db.categories.filter((c) => c.kind === 'expense').toArray(),
+  )
   const transaksi = useLiveQuery(() => db.transactions.toArray())
 
   if (!budgets || !limits || !categories || !transaksi) {
@@ -53,6 +57,10 @@ export default function Anggaran() {
   }
   function ubahBatas(categoryId: number, n: number) {
     if (budget) simpanBatasKategori(budget.id, categoryId, n)
+  }
+  async function hapus() {
+    await hapusAnggaran()
+    setKonfirmasiHapus(false)
   }
 
   return (
@@ -133,14 +141,22 @@ export default function Anggaran() {
         </div>
       )}
 
-      <h2 className="mt-1 text-xs text-teks-sekunder">Batas per kategori</h2>
+      <div className="mt-1">
+        <h2 className="text-xs text-teks-sekunder">Batas per kategori</h2>
+        <p className="text-[11px] text-teks-sekunder">
+          Kosongkan kolom untuk tanpa batas.
+        </p>
+      </div>
       {!budget && (
         <p className="text-xs text-teks-sekunder">
           Isi total anggaran dulu, lalu atur batas tiap kategori.
         </p>
       )}
       {dialokasi > total && total > 0 && (
-        <p role="alert" className="rounded-xl bg-peringatan-tint p-3 text-xs text-peringatan-teks">
+        <p
+          role="alert"
+          className="rounded-xl bg-peringatan-tint p-3 text-xs text-peringatan-teks"
+        >
           Jumlah batas kategori ({formatRupiah(dialokasi)}) melebihi total
           anggaran ({formatRupiah(total)}).
         </p>
@@ -199,6 +215,44 @@ export default function Anggaran() {
           </div>
         )
       })}
+
+      {budget && (
+        <div className="mt-2 flex flex-col items-center gap-3">
+          {konfirmasiHapus ? (
+            <div
+              role="alert"
+              className="flex w-full flex-col items-center gap-3 rounded-[20px] bg-peringatan-tint p-4"
+            >
+              <p className="text-center text-sm font-semibold text-peringatan-teks">
+                Hapus anggaran dan semua batas kategori? Transaksimu tidak ikut
+                terhapus.
+              </p>
+              <button
+                type="button"
+                onClick={() => setKonfirmasiHapus(false)}
+                className="min-h-12 w-full max-w-[240px] rounded-2xl bg-card text-sm font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={hapus}
+                className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white"
+              >
+                Ya, hapus anggaran
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setKonfirmasiHapus(true)}
+              className="min-h-12 w-full max-w-[240px] rounded-2xl bg-bahaya text-sm font-bold text-white"
+            >
+              Hapus anggaran
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

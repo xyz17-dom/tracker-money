@@ -37,6 +37,11 @@ export default function App() {
     return anggaran > 0 || transaksi > 0
   })
 
+  // Setelah semua data dihapus, onboarding muncul lagi; setelahnya mulai dari Beranda
+  useEffect(() => {
+    if (onboardingSelesai === false) setTab('beranda')
+  }, [onboardingSelesai])
+
   if (onboardingSelesai === undefined) return null
   if (!onboardingSelesai) return <Onboarding />
 
