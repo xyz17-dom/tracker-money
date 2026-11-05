@@ -26,8 +26,8 @@ function tx(
 const dasar: Masukan = {
   transaksi: [],
   categories: [
-    { id: 1, name: 'Makan', color: '', isDefault: true },
-    { id: 2, name: 'Jajan', color: '', isDefault: true },
+    { id: 1, name: 'Makan', color: '', kind: 'expense', isDefault: true },
+    { id: 2, name: 'Jajan', color: '', kind: 'expense', isDefault: true },
   ],
   sources: [{ id: 1, name: 'Tunai', type: 'cash' }],
   budget: undefined,

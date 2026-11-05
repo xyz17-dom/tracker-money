@@ -2,13 +2,18 @@ import {
   db,
   type Budget,
   type BudgetCategory,
-  type Category,
   type Setting,
   type Source,
   type Transaction,
 } from './db'
+import {
+  pastikanKategoriPemasukan,
+  type KategoriLama,
+} from '../services/kategori'
 
-const VERSI = 1
+// Versi 2: kategori punya jenis. Cadangan versi 1 tetap bisa diimpor.
+const VERSI = 2
+const VERSI_DIDUKUNG = [1, 2]
 
 export async function ekspor(): Promise<string> {
   return JSON.stringify(
@@ -51,6 +56,15 @@ function pengaturanValid(x: unknown): boolean {
   return adalahObjek(x) && typeof x.key === 'string' && typeof x.value === 'string'
 }
 
+function kategoriValid(x: unknown): boolean {
+  return (
+    punyaId(x) &&
+    adalahObjek(x) &&
+    typeof x.name === 'string' &&
+    (x.kind === undefined || x.kind === 'expense' || x.kind === 'income')
+  )
+}
+
 function transaksiValid(t: unknown): boolean {
   return (
     adalahObjek(t) &&
@@ -83,15 +97,15 @@ export async function impor(teks: string): Promise<number> {
     data = JSON.parse(teks)
   } catch {
     throw new Error(
-      'File ini bukan file cadangan Tracker Money (.json). Impor dari Excel atau foto belum tersedia',
+      'File ini bukan file cadangan Tracker Money (.json). Impor dari Excel atau foto belum tersedia.',
     )
   }
   if (!adalahObjek(data) || data.aplikasi !== 'tracker-money') {
-      throw new Error(
+    throw new Error(
       'File ini bukan cadangan Tracker Money. Impor dari Excel atau foto belum tersedia.',
     )
   }
-  if (data.versi !== VERSI) {
+  if (!VERSI_DIDUKUNG.includes(data.versi as number)) {
     throw new Error('Versi cadangan ini tidak didukung.')
   }
 
@@ -105,12 +119,21 @@ export async function impor(teks: string): Promise<number> {
   if (!transaksi.every(transaksiValid)) {
     throw new Error('Ada transaksi yang rusak di file cadangan.')
   }
-  if (![kategori, sumber, anggaran, batas].every((d) => d.every(punyaId))) {
+  if (!kategori.every(kategoriValid)) {
+    throw new Error('Ada kategori yang rusak di file cadangan.')
+  }
+  if (![sumber, anggaran, batas].every((d) => d.every(punyaId))) {
     throw new Error('Ada data yang rusak di file cadangan.')
   }
   if (!pengaturan.every(pengaturanValid)) {
     throw new Error('Ada pengaturan yang rusak di file cadangan.')
   }
+
+  // Cadangan lama (versi 1) belum punya jenis kategori: disesuaikan di sini
+  const disesuaikan = pastikanKategoriPemasukan(
+    kategori as KategoriLama[],
+    transaksi as Transaction[],
+  )
 
   // Satu transaksi database: jika gagal di tengah jalan, data lama tetap utuh
   await db.transaction(
@@ -125,8 +148,8 @@ export async function impor(teks: string): Promise<number> {
         db.budgetCategories.clear(),
         db.settings.clear(),
       ])
-      await db.transactions.bulkAdd(transaksi as Transaction[])
-      await db.categories.bulkAdd(kategori as Category[])
+      await db.transactions.bulkAdd(disesuaikan.transactions)
+      await db.categories.bulkAdd(disesuaikan.categories)
       await db.sources.bulkAdd(sumber as Source[])
       await db.budgets.bulkAdd(anggaran as Budget[])
       await db.budgetCategories.bulkAdd(batas as BudgetCategory[])

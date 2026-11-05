@@ -1,4 +1,9 @@
 import Dexie, { type EntityTable } from 'dexie'
+import {
+  KATEGORI_PEMASUKAN_BAWAAN,
+  KATEGORI_PENGELUARAN_BAWAAN,
+  pastikanKategoriPemasukan,
+} from '../services/kategori'
 
 export interface Transaction {
   id: number
@@ -17,6 +22,7 @@ export interface Category {
   id: number
   name: string
   color: string
+  kind: 'expense' | 'income' // jenis transaksi yang memakai kategori ini
   isDefault: boolean
 }
 
@@ -54,27 +60,40 @@ export const db = new Dexie('trackerMoney') as Dexie & {
   settings: EntityTable<Setting, 'key'>
 }
 
-db.version(1).stores({
+const tabel = {
   transactions: '++id, date, categoryId, [type+date]',
   categories: '++id, name',
   sources: '++id, name',
   budgets: '++id, startDate',
   budgetCategories: '++id, budgetId, categoryId',
   settings: 'key',
-})
+}
+
+db.version(1).stores(tabel)
+
+// Versi 2: kategori punya jenis (pengeluaran atau pemasukan).
+// Susunan tabel tidak berubah, hanya isi datanya yang disesuaikan.
+db.version(2)
+  .stores(tabel)
+  .upgrade(async (tx) => {
+    const categories = await tx.table('categories').toArray()
+    const transactions = await tx.table('transactions').toArray()
+    const hasil = pastikanKategoriPemasukan(categories, transactions)
+    await tx.table('categories').bulkPut(hasil.categories)
+    await tx
+      .table('transactions')
+      .bulkPut(hasil.transactions.filter((t) => t.type === 'income'))
+  })
 
 // Mengisi data awal saat aplikasi pertama kali dibuka
 export async function seedIfEmpty() {
   await db.transaction('rw', db.categories, db.sources, async () => {
     if ((await db.categories.count()) === 0) {
-      await db.categories.bulkAdd([
-        { name: 'Makan', color: '#5B5BD6', isDefault: true },
-        { name: 'Jajan', color: '#F6B8A0', isDefault: true },
-        { name: 'Transport', color: '#8FD3C1', isDefault: true },
-        { name: 'Hiburan', color: '#D9D9F2', isDefault: true },
-        { name: 'Game', color: '#6C6CE5', isDefault: true },
-        { name: 'Lainnya', color: '#A3A3BC', isDefault: true },
-      ])
+      await db.categories.bulkAdd(
+        [...KATEGORI_PENGELUARAN_BAWAAN, ...KATEGORI_PEMASUKAN_BAWAAN].map(
+          (b) => ({ ...b, isDefault: true }),
+        ),
+      )
     }
     if ((await db.sources.count()) === 0) {
       await db.sources.bulkAdd([
