@@ -7,7 +7,13 @@ import {
   ubahTransaksi,
 } from '../db/transaksiRepo'
 import { bacaFavorit } from '../db/pengaturanRepo'
-import { formatRibuan, hanyaAngka } from '../utils/format'
+import {
+  formatRibuan,
+  hanyaAngka,
+  kemarinString,
+  tanggalValid,
+  todayString,
+} from '../utils/format'
 
 type Props = {
   // Jika transaksi baru saja dihapus, ia dilaporkan agar bisa diurungkan
@@ -33,6 +39,7 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
     transaksi?.sourceId ?? null,
   )
   const [note, setNote] = useState(transaksi?.note ?? '')
+  const [tanggal, setTanggal] = useState(transaksi?.date ?? todayString())
   const [konfirmasiHapus, setKonfirmasiHapus] = useState(false)
 
   // Jika sumber dana belum dipilih, pakai yang pertama (Tunai)
@@ -58,8 +65,15 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
         ? (kategoriTampil[0]?.id ?? null)
         : null
 
+  const hariIni = todayString()
+  const kemarin = kemarinString()
+
   const bisaSimpan =
-    nominal > 0 && aktifCategoryId !== null && aktifSourceId !== null
+    nominal > 0 &&
+    aktifCategoryId !== null &&
+    aktifSourceId !== null &&
+    tanggalValid(tanggal) &&
+    tanggal <= hariIni
 
   async function simpan() {
     if (nominal <= 0 || aktifCategoryId === null || aktifSourceId === null) return
@@ -69,6 +83,7 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
       categoryId: aktifCategoryId,
       sourceId: aktifSourceId,
       note,
+      date: tanggal,
     }
     if (transaksi) {
       await ubahTransaksi(transaksi.id, input)
@@ -168,6 +183,40 @@ export default function TambahTransaksi({ onClose, transaksi }: Props) {
             {s.name}
           </button>
         ))}
+      </div>
+
+      <label htmlFor="tanggal" className="mt-1 text-xs text-teks-sekunder">
+        Tanggal
+      </label>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          aria-pressed={tanggal === hariIni}
+          onClick={() => setTanggal(hariIni)}
+          className={`min-h-11 rounded-full px-4 text-sm ${
+            tanggal === hariIni ? 'bg-aksen text-white' : 'bg-card'
+          }`}
+        >
+          Hari ini
+        </button>
+        <button
+          type="button"
+          aria-pressed={tanggal === kemarin}
+          onClick={() => setTanggal(kemarin)}
+          className={`min-h-11 rounded-full px-4 text-sm ${
+            tanggal === kemarin ? 'bg-aksen text-white' : 'bg-card'
+          }`}
+        >
+          Kemarin
+        </button>
+        <input
+          id="tanggal"
+          type="date"
+          max={hariIni}
+          value={tanggal}
+          onChange={(e) => setTanggal(e.target.value)}
+          className="h-11 min-w-0 flex-1 rounded-xl bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-aksen"
+        />
       </div>
 
       <label htmlFor="catatan" className="mt-1 text-xs text-teks-sekunder">
