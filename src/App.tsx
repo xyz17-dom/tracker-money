@@ -6,6 +6,7 @@ import { KUNCI_ONBOARDING } from './db/pengaturanRepo'
 import { pulihkanTransaksi } from './db/transaksiRepo'
 import Anggaran from './pages/Anggaran'
 import Beranda from './pages/Beranda'
+import Kategori from './pages/Kategori'
 import Onboarding from './pages/Onboarding'
 import Pengaturan from './pages/Pengaturan'
 import Riwayat from './pages/Riwayat'
@@ -15,6 +16,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('beranda')
   const [tambahTerbuka, setTambahTerbuka] = useState(false)
   const [diedit, setDiedit] = useState<Transaction | null>(null)
+  const [kategoriTerbuka, setKategoriTerbuka] = useState(false)
   // Transaksi yang baru dihapus, disimpan sebentar agar bisa diurungkan
   const [terhapus, setTerhapus] = useState<Transaction | null>(null)
 
@@ -44,6 +46,10 @@ export default function App() {
 
   if (onboardingSelesai === undefined) return null
   if (!onboardingSelesai) return <Onboarding />
+
+  if (kategoriTerbuka) {
+    return <Kategori onClose={() => setKategoriTerbuka(false)} />
+  }
 
   if (tambahTerbuka) {
     return <TambahTransaksi onClose={() => setTambahTerbuka(false)} />
@@ -76,7 +82,10 @@ export default function App() {
       {tab === 'riwayat' && <Riwayat onPilih={setDiedit} />}
       {tab === 'anggaran' && <Anggaran />}
       {tab === 'pengaturan' && (
-        <Pengaturan onBukaAnggaran={() => setTab('anggaran')} />
+        <Pengaturan
+          onBukaAnggaran={() => setTab('anggaran')}
+          onBukaKategori={() => setKategoriTerbuka(true)}
+        />
       )}
 
       {terhapus && (

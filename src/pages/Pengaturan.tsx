@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Download, FileSpreadsheet, Upload } from 'lucide-react'
+import { ChevronRight, Download, FileSpreadsheet, Tags, Upload } from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { ekspor, impor, unduh } from '../db/cadangan'
@@ -18,9 +18,12 @@ const TEMA: { id: Tema; label: string }[] = [
 
 type Status = { jenis: 'ok' | 'galat'; teks: string } | null
 
-type Props = { onBukaAnggaran: () => void }
+type Props = {
+  onBukaAnggaran: () => void
+  onBukaKategori: () => void
+}
 
-export default function Pengaturan({ onBukaAnggaran }: Props) {
+export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
   const [tema, setTema] = useState<Tema>(bacaTema)
   const [status, setStatus] = useState<Status>(null)
   const [berkas, setBerkas] = useState<File | null>(null)
@@ -172,6 +175,24 @@ export default function Pengaturan({ onBukaAnggaran }: Props) {
             />
           </button>
         </div>
+      </div>
+
+      <h2 className="mt-1 text-xs text-teks-sekunder">Kategori</h2>
+      <div className="rounded-[20px] bg-card px-4 shadow-sm">
+        <button
+          type="button"
+          onClick={onBukaKategori}
+          className="flex min-h-16 w-full items-center gap-3 text-left"
+        >
+          <Tags size={20} className="flex-none text-aksen-teks" />
+          <span className="flex-1">
+            <span className="block text-sm">Kelola kategori</span>
+            <span className="block text-xs text-teks-sekunder">
+              Tambah, ubah nama, atau hapus kategori pengeluaran dan pemasukan.
+            </span>
+          </span>
+          <ChevronRight size={18} className="flex-none text-teks-sekunder" />
+        </button>
       </div>
 
       <h2 className="mt-1 text-xs text-teks-sekunder">Data</h2>
