@@ -13,11 +13,12 @@ export default function BatangHarian({ data }: { data: HariBatang[] }) {
         {data.map((d, i) => (
           <div
             key={d.tanggal}
-            className={`w-6 rounded-md ${
+            className={`animasi-batang w-6 rounded-md ${
               i === data.length - 1 ? 'bg-aksen' : 'bg-batang'
             }`}
             style={{
               height: maks > 0 ? `${Math.max(6, (d.jumlah / maks) * 100)}%` : '6%',
+              animationDelay: `${i * 60}ms`,
             }}
           />
         ))}

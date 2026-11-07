@@ -16,3 +16,16 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+// Layar pembuka (di index.html) ditampilkan minimal sekitar 0,9 detik supaya
+// geraknya sempat terlihat, lalu memudar. Pada pengguna yang memilih "kurangi
+// gerak", layar pembuka langsung disembunyikan.
+const splash = document.getElementById('splash')
+if (splash) {
+  const kurangiGerak = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const sisaWaktu = kurangiGerak ? 0 : Math.max(0, 900 - performance.now())
+  setTimeout(() => {
+    splash.classList.add('selesai')
+    setTimeout(() => splash.remove(), 450)
+  }, sisaWaktu)
+}

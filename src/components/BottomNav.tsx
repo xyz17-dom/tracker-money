@@ -28,16 +28,22 @@ export default function BottomNav({ aktif, onPilih }: Props) {
             type="button"
             aria-current={dipilih ? 'page' : undefined}
             onClick={() => onPilih(id)}
-            className={`flex h-16 flex-1 flex-col items-center justify-center gap-0.5 text-xs ${
+            className={`flex h-16 flex-1 flex-col items-center justify-center gap-0.5 text-xs transition-colors duration-200 ${
               dipilih ? 'font-bold text-aksen-teks' : 'text-teks-sekunder'
             }`}
           >
             <span
-              className={`flex h-7 w-12 items-center justify-center rounded-full ${
+              className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors duration-200 ${
                 dipilih ? 'bg-aksen-tint' : ''
               }`}
             >
-              <Ikon size={22} strokeWidth={dipilih ? 2.25 : 1.75} />
+              <Ikon
+                size={22}
+                strokeWidth={dipilih ? 2.25 : 1.75}
+                className={`transition-transform duration-200 ${
+                  dipilih ? 'scale-110' : ''
+                }`}
+              />
             </span>
             {label}
           </button>

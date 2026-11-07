@@ -47,24 +47,35 @@ export default function App() {
   if (onboardingSelesai === undefined) return null
   if (!onboardingSelesai) return <Onboarding />
 
+  // Layar penuh naik dari bawah
   if (kategoriTerbuka) {
-    return <Kategori onClose={() => setKategoriTerbuka(false)} />
+    return (
+      <div className="animasi-naik">
+        <Kategori onClose={() => setKategoriTerbuka(false)} />
+      </div>
+    )
   }
 
   if (tambahTerbuka) {
-    return <TambahTransaksi onClose={() => setTambahTerbuka(false)} />
+    return (
+      <div className="animasi-naik">
+        <TambahTransaksi onClose={() => setTambahTerbuka(false)} />
+      </div>
+    )
   }
 
   if (diedit) {
     return (
-      <TambahTransaksi
-        key={diedit.id}
-        transaksi={diedit}
-        onClose={(dihapus) => {
-          setDiedit(null)
-          if (dihapus) setTerhapus(dihapus)
-        }}
-      />
+      <div className="animasi-naik">
+        <TambahTransaksi
+          key={diedit.id}
+          transaksi={diedit}
+          onClose={(dihapus) => {
+            setDiedit(null)
+            if (dihapus) setTerhapus(dihapus)
+          }}
+        />
+      </div>
     )
   }
 
@@ -78,20 +89,25 @@ export default function App() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[430px] bg-latar pb-24 font-sans text-teks">
-      {tab === 'beranda' && <Beranda onBukaAnggaran={() => setTab('anggaran')} />}
-      {tab === 'riwayat' && <Riwayat onPilih={setDiedit} />}
-      {tab === 'anggaran' && <Anggaran />}
-      {tab === 'pengaturan' && (
-        <Pengaturan
-          onBukaAnggaran={() => setTab('anggaran')}
-          onBukaKategori={() => setKategoriTerbuka(true)}
-        />
-      )}
+      {/* key={tab}: tiap pindah tab, isinya masuk dengan gerak halus */}
+      <div key={tab} className="animasi-halaman">
+        {tab === 'beranda' && (
+          <Beranda onBukaAnggaran={() => setTab('anggaran')} />
+        )}
+        {tab === 'riwayat' && <Riwayat onPilih={setDiedit} />}
+        {tab === 'anggaran' && <Anggaran />}
+        {tab === 'pengaturan' && (
+          <Pengaturan
+            onBukaAnggaran={() => setTab('anggaran')}
+            onBukaKategori={() => setKategoriTerbuka(true)}
+          />
+        )}
+      </div>
 
       {terhapus && (
         <div
           role="status"
-          className="fixed inset-x-0 bottom-[calc(9rem+env(safe-area-inset-bottom))] z-20 mx-auto flex max-w-[430px] justify-center px-4"
+          className="animasi-toast fixed inset-x-0 bottom-[calc(9rem+env(safe-area-inset-bottom))] z-20 mx-auto flex max-w-[430px] justify-center px-4"
         >
           <div className="flex items-center gap-3 rounded-2xl bg-teks py-2 pl-4 pr-2 text-sm text-latar shadow-lg">
             <span>Transaksi dihapus</span>

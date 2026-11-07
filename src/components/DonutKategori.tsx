@@ -43,7 +43,7 @@ export default function DonutKategori({ perKategori, namaKategori }: Props) {
         viewBox="0 0 100 100"
         role="img"
         aria-label={`Pengeluaran per kategori: ${ringkasan}`}
-        className="h-24 w-24 flex-none"
+        className="animasi-donut h-24 w-24 flex-none"
       >
         <circle cx="50" cy="50" r={R} fill="none" stroke="var(--track)" strokeWidth="14" />
         {irisan.map((s, i) => {

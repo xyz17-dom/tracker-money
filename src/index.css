@@ -66,4 +66,95 @@ body {
   background: var(--latar);
   color: var(--teks);
   font-family: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ---------- Gerak ----------
+   Semua gerak singkat (di bawah satu detik), dan dimatikan otomatis bagi
+   pengguna yang memilih "kurangi gerak" di pengaturan HP-nya. */
+
+@keyframes masuk {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes naik {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast-masuk {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tumbuh-y {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@keyframes tumbuh-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes donut-masuk {
+  from { opacity: 0; transform: rotate(-60deg) scale(0.8); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Isi satu layar (tab) masuk satu per satu dari atas ke bawah */
+.animasi-halaman > div > * {
+  animation: masuk 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.animasi-halaman > div > :nth-child(2) { animation-delay: 40ms; }
+.animasi-halaman > div > :nth-child(3) { animation-delay: 80ms; }
+.animasi-halaman > div > :nth-child(4) { animation-delay: 120ms; }
+.animasi-halaman > div > :nth-child(5) { animation-delay: 160ms; }
+.animasi-halaman > div > :nth-child(6) { animation-delay: 200ms; }
+.animasi-halaman > div > :nth-child(7) { animation-delay: 240ms; }
+.animasi-halaman > div > :nth-child(8) { animation-delay: 280ms; }
+.animasi-halaman > div > :nth-child(n + 9) { animation-delay: 320ms; }
+
+/* Layar penuh (Tambah transaksi, Kelola kategori) naik dari bawah */
+.animasi-naik {
+  animation: naik 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.animasi-toast {
+  animation: toast-masuk 0.25s ease both;
+}
+
+/* Grafik tumbuh saat tampil */
+.animasi-batang {
+  transform-origin: bottom;
+  animation: tumbuh-y 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.animasi-donut {
+  animation: donut-masuk 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+/* Isi bar progres (di dalam jalur .bg-track.h-2) memanjang dari kiri */
+.bg-track.h-2 > .h-2 {
+  transform-origin: left;
+  animation: tumbuh-x 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+/* Tombol terasa "ditekan" */
+@layer base {
+  button {
+    transition:
+      transform 0.12s ease,
+      background-color 0.2s ease,
+      color 0.2s ease,
+      opacity 0.2s ease;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

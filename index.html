@@ -12,8 +12,103 @@
     <meta name="theme-color" content="#5B5BD6" />
     <meta name="color-scheme" content="light dark" />
     <meta name="apple-mobile-web-app-title" content="Tracker Money" />
+
+    <!-- Memasang tema sebelum halaman pertama digambar, supaya tidak ada
+         kedipan terang saat memilih tema gelap -->
+    <script>
+      try {
+        var t = localStorage.getItem('tema')
+        var gelap =
+          t === 'dark' ||
+          ((t === null || t === 'system') &&
+            matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = gelap ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
+
+    <!-- Gaya layar pembuka ditulis langsung di sini agar tampil seketika,
+         sebelum berkas CSS aplikasi selesai dimuat -->
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f6f5fb;
+        transition: opacity 0.4s ease, visibility 0.4s;
+      }
+      [data-theme='dark'] #splash {
+        background: #14141f;
+      }
+      #splash.selesai {
+        opacity: 0;
+        visibility: hidden;
+      }
+      #splash .isi {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        animation: splash-masuk 0.45s ease both;
+      }
+      #splash svg {
+        width: 96px;
+        height: 96px;
+      }
+      #splash .b {
+        transform-box: fill-box;
+        transform-origin: 50% 100%;
+        animation: splash-naik 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      #splash .b1 { animation-delay: 0.1s; }
+      #splash .b2 { animation-delay: 0.22s; }
+      #splash .b3 { animation-delay: 0.34s; }
+      #splash p {
+        margin: 0;
+        font: 600 16px/1 system-ui, -apple-system, 'Segoe UI', sans-serif;
+        letter-spacing: 0.02em;
+        color: #22223b;
+        animation: splash-teks 0.5s ease 0.5s both;
+      }
+      [data-theme='dark'] #splash p {
+        color: #ececf6;
+      }
+      @keyframes splash-masuk {
+        from { opacity: 0; transform: scale(0.92); }
+        to { opacity: 1; transform: none; }
+      }
+      @keyframes splash-naik {
+        from { transform: scaleY(0); }
+        to { transform: scaleY(1); }
+      }
+      @keyframes splash-teks {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: none; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .isi, #splash .b, #splash p {
+          animation: none;
+        }
+        #splash {
+          transition: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" aria-hidden="true">
+      <div class="isi">
+        <svg viewBox="0 0 1024 1024" role="presentation">
+          <rect width="1024" height="1024" rx="230" fill="#5B5BD6" />
+          <rect class="b b1" x="227" y="540" width="150" height="220" rx="36" fill="#D6D6F5" />
+          <rect class="b b2" x="437" y="400" width="150" height="360" rx="36" fill="#D6D6F5" />
+          <rect class="b b3" x="647" y="260" width="150" height="500" rx="36" fill="#FFFFFF" />
+        </svg>
+        <p>Tracker Money</p>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
