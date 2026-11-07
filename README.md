@@ -6,9 +6,8 @@ Tracker Money is a Progressive Web App (PWA). It installs on Android and iOS, wo
 
 > **Status:** MVP, being tested with its first users.
 
-<!-- Add after deploying:
-**Live demo:** https://your-app.vercel.app
--->
+Add after deploying:
+**Live demo:** https://tracker-money-mauve.vercel.app/
 
 <!-- Add screenshots to docs/screenshots and link them here:
 ![Dashboard](docs/screenshots/dashboard.png)
