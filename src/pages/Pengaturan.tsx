@@ -1,5 +1,15 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { ChevronRight, Download, FileSpreadsheet, Tags, Upload } from 'lucide-react'
+import {
+  ChevronRight,
+  Download,
+  FileSpreadsheet,
+  Monitor,
+  Moon,
+  Sun,
+  Tags,
+  Upload,
+  type LucideIcon,
+} from 'lucide-react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../db/db'
 import { ekspor, impor, unduh } from '../db/cadangan'
@@ -10,10 +20,10 @@ import { todayString } from '../utils/format'
 import { bacaTema, simpanTema, type Tema } from '../utils/tema'
 import { unduhBlob } from '../utils/unduh'
 
-const TEMA: { id: Tema; label: string }[] = [
-  { id: 'system', label: 'Ikuti sistem' },
-  { id: 'light', label: 'Terang' },
-  { id: 'dark', label: 'Gelap' },
+const TEMA: { id: Tema; label: string; Ikon: LucideIcon }[] = [
+  { id: 'system', label: 'Ikuti sistem', Ikon: Monitor },
+  { id: 'light', label: 'Terang', Ikon: Sun },
+  { id: 'dark', label: 'Gelap', Ikon: Moon },
 ]
 
 type Status = { jenis: 'ok' | 'galat'; teks: string } | null
@@ -117,27 +127,27 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
       <h1 className="text-[22px] font-bold">Pengaturan</h1>
 
       <h2 className="mt-1 text-xs text-teks-sekunder">Tampilan</h2>
-      <div className="rounded-[20px] bg-card p-4 shadow-sm">
-        <p className="mb-2.5 text-sm">Tema</p>
-        <div className="flex rounded-xl bg-track p-1">
-          {TEMA.map((t) => (
+      <div className="flex min-h-16 items-center justify-between gap-3 rounded-[20px] bg-card px-4 shadow-sm">
+        <p className="text-sm">Tema</p>
+        <div role="group" aria-label="Pilih tema" className="flex rounded-xl bg-track p-1">
+          {TEMA.map(({ id, label, Ikon }) => (
             <button
-              key={t.id}
+              key={id}
               type="button"
-              aria-pressed={tema === t.id}
-              onClick={() => pilihTema(t.id)}
-              className={`min-h-10 flex-1 rounded-[9px] text-[13px] ${
-                tema === t.id ? 'bg-segmen-aktif font-bold' : 'text-teks-sekunder'
+              aria-pressed={tema === id}
+              aria-label={label}
+              title={label}
+              onClick={() => pilihTema(id)}
+              className={`flex h-11 w-12 items-center justify-center rounded-[9px] ${
+                tema === id
+                  ? 'bg-segmen-aktif text-aksen-teks'
+                  : 'text-teks-sekunder'
               }`}
             >
-              {t.label}
+              <Ikon size={18} strokeWidth={tema === id ? 2.25 : 1.75} />
             </button>
           ))}
         </div>
-        <p className="mt-3 text-xs text-teks-sekunder">
-          Memakai HP Samsung dan warnanya tidak sesuai pilihan? Pasang aplikasi
-          lewat Chrome, atau matikan mode gelap paksa di Samsung Internet.
-        </p>
       </div>
 
       <h2 className="mt-1 text-xs text-teks-sekunder">Anggaran</h2>
@@ -243,7 +253,6 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
         <input
           ref={inputRef}
           type="file"
-          accept="application/json,.json"
           onChange={pilihBerkas}
           className="hidden"
           aria-label="Pilih file cadangan"

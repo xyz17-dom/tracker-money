@@ -94,7 +94,8 @@ function ambilDaftar(data: Record<string, unknown>, nama: string): unknown[] {
 export async function impor(teks: string): Promise<number> {
   let data: unknown
   try {
-    data = JSON.parse(teks)
+    // Beberapa aplikasi menambah penanda BOM di awal file; dibuang sebelum dibaca
+    data = JSON.parse(teks.replace(/^\uFEFF/, ''))
   } catch {
     throw new Error(
       'File ini bukan file cadangan Tracker Money (.json). Impor dari Excel atau foto belum tersedia.',

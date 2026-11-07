@@ -45,4 +45,13 @@ describe('impor cadangan', () => {
     expect(await db.categories.count()).toBe(sebelum)
     db.close()
   })
+
+  it('menerima file yang diawali penanda BOM', async () => {
+    const { db } = await import('./db')
+    const { impor, ekspor } = await import('./cadangan')
+    await db.open()
+    const berkas = await ekspor()
+    expect(await impor('\uFEFF' + berkas)).toBeTypeOf('number')
+    db.close()
+  })
 })
