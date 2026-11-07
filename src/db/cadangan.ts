@@ -98,12 +98,12 @@ export async function impor(teks: string): Promise<number> {
     data = JSON.parse(teks.replace(/^\uFEFF/, ''))
   } catch {
     throw new Error(
-      'File ini bukan file cadangan Tracker Money (.json). Impor dari Excel atau foto belum tersedia.',
+      'File ini bukan file cadangan Tracker Money. Memasukkan catatan dari Excel atau foto belum bisa.',
     )
   }
   if (!adalahObjek(data) || data.aplikasi !== 'tracker-money') {
     throw new Error(
-      'File ini bukan cadangan Tracker Money. Impor dari Excel atau foto belum tersedia.',
+      'File ini bukan cadangan Tracker Money. Memasukkan catatan dari Excel atau foto belum bisa.',
     )
   }
   if (!VERSI_DIDUKUNG.includes(data.versi as number)) {

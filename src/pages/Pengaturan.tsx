@@ -66,7 +66,7 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
       unduh(`tracker-money-${todayString()}.json`, await ekspor())
       setStatus({
         jenis: 'ok',
-        teks: 'Cadangan diunduh. Simpan file itu di tempat yang aman.',
+        teks: 'Cadangan tersimpan. Simpan filenya di tempat yang aman.',
       })
     } catch {
       setStatus({ jenis: 'galat', teks: 'Gagal membuat cadangan.' })
@@ -127,9 +127,9 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
       <h1 className="text-[22px] font-bold">Pengaturan</h1>
 
       <h2 className="mt-1 text-xs text-teks-sekunder">Tampilan</h2>
-      <div className="flex min-h-16 items-center justify-between gap-3 rounded-[20px] bg-card px-4 shadow-sm">
+      <div className="flex min-h-14 items-center justify-between gap-3 rounded-[20px] bg-card px-4 shadow-sm">
         <p className="text-sm">Tema</p>
-        <div role="group" aria-label="Pilih tema" className="flex rounded-xl bg-track p-1">
+        <div role="group" aria-label="Pilih tema" className="flex rounded-lg bg-track p-0.5">
           {TEMA.map(({ id, label, Ikon }) => (
             <button
               key={id}
@@ -138,13 +138,13 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
               aria-label={label}
               title={label}
               onClick={() => pilihTema(id)}
-              className={`flex h-11 w-12 items-center justify-center rounded-[9px] ${
+              className={`flex h-9 w-11 items-center justify-center rounded-[7px] ${
                 tema === id
                   ? 'bg-segmen-aktif text-aksen-teks'
                   : 'text-teks-sekunder'
               }`}
             >
-              <Ikon size={18} strokeWidth={tema === id ? 2.25 : 1.75} />
+              <Ikon size={16} strokeWidth={tema === id ? 2.25 : 1.75} />
             </button>
           ))}
         </div>
@@ -198,7 +198,7 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
           <span className="flex-1">
             <span className="block text-sm">Kelola kategori</span>
             <span className="block text-xs text-teks-sekunder">
-              Tambah, ubah nama, atau hapus kategori pengeluaran dan pemasukan.
+              Tambah, ganti nama, atau hapus kategori.
             </span>
           </span>
           <ChevronRight size={18} className="flex-none text-teks-sekunder" />
@@ -214,9 +214,9 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
         >
           <Download size={20} className="flex-none text-aksen-teks" />
           <span className="flex-1">
-            <span className="block text-sm">Ekspor cadangan (.json)</span>
+            <span className="block text-sm">Simpan cadangan</span>
             <span className="block text-xs text-teks-sekunder">
-              Simpan semua datamu ke sebuah file.
+              Simpan semua catatanmu jadi satu file.
             </span>
           </span>
         </button>
@@ -228,11 +228,11 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
         >
           <FileSpreadsheet size={20} className="flex-none text-aksen-teks" />
           <span className="flex-1">
-            <span className="block text-sm">Ekspor laporan Excel (.xlsx)</span>
+            <span className="block text-sm">Laporan Excel</span>
             <span className="block text-xs text-teks-sekunder">
               {menyiapkanExcel
                 ? 'Menyiapkan laporan...'
-                : 'Untuk dibaca atau diolah di Excel. Bukan untuk diimpor kembali.'}
+                : 'Untuk dilihat di Excel. Tidak bisa dimasukkan lagi ke sini.'}
             </span>
           </span>
         </button>
@@ -243,10 +243,10 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
         >
           <Upload size={20} className="flex-none text-aksen-teks" />
           <span className="flex-1">
-            <span className="block text-sm">Impor cadangan (.json)</span>
+            <span className="block text-sm">Pulihkan dari cadangan</span>
             <span className="block text-xs text-teks-sekunder">
-              Hanya untuk file cadangan dari Tracker Money. Menggantikan semua
-              data saat ini.
+              Pakai file cadangan dari aplikasi ini. Catatan sekarang akan
+              diganti.
             </span>
           </span>
         </button>
@@ -260,15 +260,15 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
       </div>
 
       <p className="rounded-xl bg-aksen-tint p-3 text-xs text-aksen-teks">
-        Semua datamu tersimpan di HP ini dan tidak dikirim ke mana pun. Pindah
-        HP? Ekspor cadangan dulu, lalu impor di HP baru.
+        Semua catatanmu tersimpan di HP ini, tidak dikirim ke mana pun. Ganti
+        HP? Simpan cadangan dulu, lalu pulihkan di HP baru.
       </p>
 
       {berkas && (
         <div role="alert" className="rounded-[20px] bg-peringatan-tint p-4">
           <p className="text-sm font-semibold text-peringatan-teks">
-            Impor <strong>{berkas.name}</strong> akan menggantikan semua data saat
-            ini. Lanjutkan?
+            Catatan sekarang akan diganti dengan isi{' '}
+            <strong>{berkas.name}</strong>. Lanjutkan?
           </p>
           <div className="mt-3 flex gap-2">
             <button
@@ -309,9 +309,8 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
             <div className="w-full">
               <p className="text-sm font-semibold">Hapus semua data</p>
               <p className="mt-1 text-xs text-teks-sekunder">
-                Menghapus semua transaksi, anggaran, dan pengaturan di HP ini,
-                lalu memulai dari awal. Pilihan tema tidak ikut terhapus.
-                Tindakan ini tidak bisa dibatalkan.
+                Menghapus semua catatan dan pengaturan di HP ini, lalu mulai
+                dari awal. Tidak bisa dibatalkan.
               </p>
             </div>
             <button
@@ -325,15 +324,15 @@ export default function Pengaturan({ onBukaAnggaran, onBukaKategori }: Props) {
         ) : (
           <div role="alert" className="flex flex-col items-center gap-3">
             <p className="w-full text-sm font-semibold text-peringatan-teks">
-              Semua datamu akan hilang. Simpan cadangan dulu supaya bisa
-              dipulihkan lewat Impor.
+              Semua catatanmu akan hilang. Simpan cadangan dulu supaya bisa
+              dipulihkan.
             </p>
             <button
               type="button"
               onClick={unduhCadangan}
               className="min-h-12 w-full max-w-[240px] rounded-2xl bg-aksen text-sm font-bold text-white"
             >
-              Unduh cadangan dulu
+              Simpan cadangan dulu
             </button>
             <label htmlFor="ketik-hapus" className="w-full text-xs text-teks-sekunder">
               Ketik HAPUS untuk melanjutkan
